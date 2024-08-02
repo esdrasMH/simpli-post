@@ -1,15 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Esdras Malavé" />
+    <meta
+      name="description"
+      content="Genera ofertas laborales rápidamente y compártelas en los portales de trabajo de tu interés."
+    />
+    <meta
+      name="keywords"
+      content="oferta laboral, generar oferta laboral, compartir oferta laboral, guía de empleo, estructura de oferta laboral"
+    />
+    <meta name="robots" content="index, follow" />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SimpliPost</title>
-</head>
+    <!-- Open Graph Meta Tags -->
+    <meta
+      property="og:title"
+      content="SimpliPost | Generador de Ofertas Laborales"
+    />
+    <meta
+      property="og:description"
+      content="Genera ofertas laborales rápidamente y compártelas en los portales de trabajo de tu interés."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ VUE_APP_BASE_URL }}" />
+    <meta property="og:image" content="/logo.jpeg" />
 
-<body>
-  <div id="app"></div>
-  <script type="module" src="/src/main.js"></script>
-</body>
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="SimpliPost | Generador de Ofertas Laborales"
+    />
+    <meta
+      name="twitter:description"
+      content="Genera ofertas laborales rápidamente y compártelas en los portales de trabajo de tu interés."
+    />
+    <meta name="twitter:image" content="/logo.jpeg" />
+    <link rel="icon" type="image/jpeg" href="/favicon.jpeg" />
+    <link rel="canonical" href="{{ VUE_APP_BASE_URL }}/" />
 
+    <link
+      rel="sitemap"
+      type="application/xml"
+      href="{{ VUE_APP_BASE_URL }}/sitemap.xml"
+    />
+    <title>SimpliPost | Generador de Ofertas Laborales</title>
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>

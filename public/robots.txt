@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://simpli-post.netlify.app/sitemap.xml
