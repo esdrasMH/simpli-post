@@ -1,7 +1,18 @@
 <template>
   <v-app>
     <v-app-bar>
-      <v-app-bar-title>SimpliPost</v-app-bar-title>
+      <template v-slot:prepend>
+        <img
+          src="/favicon.jpeg"
+          alt="logo de Simpli Post"
+          class="ml-4"
+          width="48"
+          height="48"
+          style="border-radius: 50%"
+        />
+      </template>
+
+      <v-app-bar-title><strong>SimpliPost</strong></v-app-bar-title>
 
       <v-spacer></v-spacer>
 
