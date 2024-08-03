@@ -2,9 +2,10 @@
   <section>
     <div class="my-4">
       <v-btn
+        id="copiar-texto"
         color="primary text float-right"
         @click="copiarTexto"
-        title="Limpiar todos los campos"
+        title="Copiar texto de la vacante en el portapapeles"
         :disabled="!props.estadoFormulario"
       >
         <v-icon icon="mdi-content-copy"></v-icon>
@@ -114,6 +115,7 @@
 <script setup>
 import { onMounted, onUnmounted, defineProps, reactive, computed } from "vue";
 import { useDisplay } from "vuetify";
+import { event } from "vue-gtag";
 
 onMounted(() => {
   const stringLocalStorage = localStorage.getItem("vacante");
@@ -245,6 +247,18 @@ function copiarTexto() {
   }
 
   seleccion.removeAllRanges();
+
+  capturarAnalitica(
+    "Copiar texto",
+    "Copiar texto de la vacante en el portapapeles"
+  );
+}
+function capturarAnalitica(etiqueta, descripcion) {
+  event("click", {
+    event_category: "Buttons",
+    event_label: etiqueta,
+    event_action: descripcion,
+  });
 }
 </script>
 

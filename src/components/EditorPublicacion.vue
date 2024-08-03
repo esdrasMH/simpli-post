@@ -2,6 +2,7 @@
   <section>
     <div class="my-4">
       <v-btn
+        id="limpiar-todos-campos"
         color="primary float-right"
         @click="resetearCampos"
         title="Limpiar todos los campos"
@@ -17,6 +18,7 @@
       <fieldset>
         <legend>Sobre la empresa</legend>
         <v-text-field
+          id="nombre-empresa"
           variant="outlined"
           density="compact"
           class="mb-2"
@@ -24,13 +26,30 @@
           label="Nombre de la empresa *"
           placeholder="Hooli"
           :rules="reglasValidacionFormulario.requerido"
+          @focus="
+            capturarAnalitica(
+              'Focus',
+              'Inputs',
+              'Nombre de la empresa',
+              'Llenar campo con nombre de la empresa'
+            )
+          "
         ></v-text-field>
         <v-textarea
+          id="descripcion-empresa"
           variant="outlined"
           density="compact"
           v-model.trim="vacante.descripcionEmpresa"
           label="Descripción de la empresa"
           placeholder="Somos una empresa líder en el sector de la tecnología, especializada en el desarrollo de soluciones innovadoras para clientes de diversos sectores. Nos enorgullece ofrecer productos de alta calidad y experiencias de usuario excepcionales que impulsan el éxito de nuestros clientes en un mundo digitalmente conectado."
+          @focus="
+            capturarAnalitica(
+              'Focus',
+              'Inputs',
+              'Descripción de la empresa',
+              'Llenar campo con descripción de la empresa'
+            )
+          "
         ></v-textarea>
       </fieldset>
 
@@ -38,6 +57,7 @@
       <fieldset>
         <legend>Sobre la vacante</legend>
         <v-combobox
+          id="nombre-vacante"
           variant="outlined"
           density="compact"
           class="mb-2"
@@ -48,17 +68,35 @@
           item-value="id"
           :custom-filter="filtrarBusqueda"
           :rules="reglasValidacionFormulario.requerido"
+          @focus="
+            capturarAnalitica(
+              'Focus',
+              'Inputs',
+              'Título de la vacante',
+              'Llenar campo con título de la vacante'
+            )
+          "
         ></v-combobox>
 
         <v-textarea
+          id="descripcion-vacante"
           variant="outlined"
           density="compact"
           v-model.trim="vacante.descripcionVacante"
           label="Descripción de la vacante"
           placeholder="Estamos buscando un Desarrollador Frontend Junior altamente talentoso y motivado para unirse a nuestro equipo de desarrollo. El candidato seleccionado será responsable de desarrollar e implementar interfaces de usuario atractivas y funcionales para nuestras aplicaciones web y plataformas digitales."
+          @focus="
+            capturarAnalitica(
+              'Focus',
+              'Inputs',
+              'Descripción de la vacante',
+              'Llenar campo con descripción de la vacante'
+            )
+          "
         ></v-textarea>
 
         <v-text-field
+          id="responsabilidades-principales"
           variant="outlined"
           density="compact"
           v-model.trim="vacante.tarea"
@@ -66,12 +104,35 @@
           placeholder="Desarrollar interfaces de usuario"
           :rules="validarReglaTareas"
           append-inner-icon="mdi-plus-circle"
-          @click:append-inner="agregarTarea"
-          @keyup.enter="agregarTarea"
+          @click:append-inner="
+            agregarTarea(
+              'Click',
+              'Inputs',
+              'Responsabilidades principales',
+              'Añadir responsabilidad principal'
+            )
+          "
+          @keyup.enter="
+            agregarTarea(
+              'Keyup',
+              'Inputs',
+              'Responsabilidades principales',
+              'Añadir responsabilidad principal'
+            )
+          "
+          @focus="
+            capturarAnalitica(
+              'Focus',
+              'Inputs',
+              'Responsabilidades principales',
+              'Llenar campo con responsabilidades principales'
+            )
+          "
         ></v-text-field>
 
         <v-chip-group v-if="vacante.tareas.length" column class="mt-n2 mb-1">
           <v-chip
+            :id="`responsabilidad-principal-${index}`"
             v-for="(tarea, index) in vacante.tareas"
             closable
             @click:close="eliminarTarea(index)"
@@ -85,6 +146,7 @@
       <fieldset>
         <legend>Requisitos</legend>
         <v-text-field
+          id="requisitos-excluyentes"
           variant="outlined"
           density="compact"
           class="mb-2"
@@ -93,8 +155,30 @@
           placeholder="HTML"
           :rules="validarReglaRequisitos"
           append-inner-icon="mdi-plus-circle"
-          @click:append-inner="agregarRequisitoExcluyente"
-          @keyup.enter="agregarRequisitoExcluyente"
+          @click:append-inner="
+            agregarRequisitoExcluyente(
+              'Click',
+              'Inputs',
+              'Requisitos excluyentes',
+              'Añadir requisito excluyente'
+            )
+          "
+          @keyup.enter="
+            agregarRequisitoExcluyente(
+              'Keyup',
+              'Inputs',
+              'Requisitos excluyentes',
+              'Añadir requisito excluyente'
+            )
+          "
+          @focus="
+            capturarAnalitica(
+              'Focus',
+              'Inputs',
+              'Requisitos excluyentes',
+              'Llenar campo con requisitos excluyentes'
+            )
+          "
         ></v-text-field>
 
         <v-chip-group
@@ -103,6 +187,7 @@
           class="mt-n5 mb-3"
         >
           <v-chip
+            :id="`requisito-excluyente-${index}`"
             v-for="(requisito, index) in vacante.requisitosExcluyentes"
             closable
             @click:close="eliminarRequisitoExcluyente(index)"
@@ -112,14 +197,37 @@
         </v-chip-group>
 
         <v-text-field
+          id="requisitos-deseables"
           variant="outlined"
           density="compact"
           v-model.trim="vacante.requisitoDeseable"
           label="Requisitos deseables"
           placeholder="Vue.js"
           append-inner-icon="mdi-plus-circle"
-          @click:append-inner="agregarRequisitoDeseable"
-          @keyup.enter="agregarRequisitoDeseable"
+          @click:append-inner="
+            agregarRequisitoDeseable(
+              'Click',
+              'Inputs',
+              'Requisitos deseables',
+              'Añadir requisito deseable'
+            )
+          "
+          @keyup.enter="
+            agregarRequisitoDeseable(
+              'Keyup',
+              'Inputs',
+              'Requisitos deseables',
+              'Añadir requisito deseable'
+            )
+          "
+          @focus="
+            capturarAnalitica(
+              'Focus',
+              'Inputs',
+              'Requisitos deseables',
+              'Llenar campo con requisitos deseables'
+            )
+          "
         ></v-text-field>
 
         <v-chip-group
@@ -128,6 +236,7 @@
           class="mt-n2 mb-1"
         >
           <v-chip
+            :id="`requisito-deseable-${index}`"
             v-for="(requisito, index) in vacante.requisitosDeseables"
             closable
             @click:close="eliminarRequisitoDeseable(index)"
@@ -143,6 +252,7 @@
         <v-row no-gutters>
           <v-col cols="12" sm="4">
             <v-combobox
+              id="moneda-pago"
               variant="outlined"
               density="compact"
               v-model.trim="vacante.moneda"
@@ -152,10 +262,19 @@
               item-value="id"
               :custom-filter="filtrarBusqueda"
               @update:modelValue="resetearCamposPago"
+              @focus="
+                capturarAnalitica(
+                  'Focus',
+                  'Inputs',
+                  'Moneda de pago',
+                  'Llenar campo con moneda de pago'
+                )
+              "
             ></v-combobox>
           </v-col>
           <v-col cols="12" sm="4">
             <v-text-field
+              id="renta-minima"
               variant="outlined"
               density="compact"
               :class="smAndUp ? 'mx-2' : 'mx-0'"
@@ -163,10 +282,19 @@
               label="Renta mínima mensual"
               type="number"
               :min="0"
+              @focus="
+                capturarAnalitica(
+                  'Focus',
+                  'Inputs',
+                  'Renta mínima mensual',
+                  'Llenar campo con renta mínima mensual'
+                )
+              "
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="4">
             <v-text-field
+              id="renta-maxima"
               variant="outlined"
               density="compact"
               class="mb-2"
@@ -175,19 +303,50 @@
               type="number"
               :min="0"
               :rules="reglasValidacionFormulario.rentaMaxima"
+              @focus="
+                capturarAnalitica(
+                  'Focus',
+                  'Inputs',
+                  'Renta máxima mensual',
+                  'Llenar campo con renta máxima mensual'
+                )
+              "
             ></v-text-field>
           </v-col>
         </v-row>
 
         <v-text-field
+          id="beneficios-ofrecidos"
           variant="outlined"
           density="compact"
           v-model.trim="vacante.beneficio"
           label="Beneficios ofrecidos"
           placeholder="Seguro médico"
           append-inner-icon="mdi-plus-circle"
-          @click:append-inner="agregarBeneficio"
-          @keyup.enter="agregarBeneficio"
+          @click:append-inner="
+            agregarBeneficio(
+              'Click',
+              'Inputs',
+              'Beneficios ofrecidos',
+              'Añadir beneficio ofrecido'
+            )
+          "
+          @keyup.enter="
+            agregarBeneficio(
+              'Keyup',
+              'Inputs',
+              'Beneficios ofrecidos',
+              'Añadir beneficio ofrecido'
+            )
+          "
+          @focus="
+            capturarAnalitica(
+              'Focus',
+              'Inputs',
+              'Beneficios ofrecidos',
+              'Llenar campo con beneficios ofrecidos'
+            )
+          "
         ></v-text-field>
 
         <v-chip-group
@@ -196,6 +355,7 @@
           class="mt-n2 mb-1"
         >
           <v-chip
+            :id="`beneficio-ofrecido-${index}`"
             v-for="(beneficio, index) in vacante.beneficios"
             closable
             @click:close="eliminarBeneficio(index)"
@@ -211,6 +371,7 @@
         <v-row no-gutters>
           <v-col cols="12" sm="4">
             <v-select
+              id="tipo-jornada"
               variant="outlined"
               density="compact"
               class="mb-2"
@@ -221,24 +382,42 @@
               item-value="id"
               return-object
               :rules="reglasValidacionFormulario.requerido"
+              @focus="
+                capturarAnalitica(
+                  'Focus',
+                  'Inputs',
+                  'Tipo de jornada',
+                  'Llenar campo con tipo de jornada'
+                )
+              "
             ></v-select>
           </v-col>
           <v-col cols="12" sm="4">
             <v-select
+              id="modalidad"
               variant="outlined"
               density="compact"
               :class="smAndUp ? 'mx-2' : 'mx-0'"
               v-model="vacante.modalidad"
-              label="Ubicación *"
+              label="Modalidad *"
               :items="modalidades"
               item-title="nombre"
               item-value="id"
               return-object
               :rules="reglasValidacionFormulario.requerido"
+              @focus="
+                capturarAnalitica(
+                  'Focus',
+                  'Inputs',
+                  'Modalidad de empleo',
+                  'Llenar campo con modalidad de empleo'
+                )
+              "
             ></v-select>
           </v-col>
           <v-col cols="12" sm="4">
             <v-combobox
+              id="pais-origen"
               variant="outlined"
               density="compact"
               v-model.trim="vacante.pais"
@@ -249,11 +428,20 @@
               :custom-filter="filtrarBusqueda"
               :disabled="validarActivacionCampoPais"
               :rules="validarReglaPais"
+              @focus="
+                capturarAnalitica(
+                  'Focus',
+                  'Inputs',
+                  'País de empleo',
+                  'Llenar campo con país de empleo'
+                )
+              "
             ></v-combobox>
           </v-col>
         </v-row>
 
         <v-text-field
+          id="direccion"
           variant="outlined"
           density="compact"
           v-model.trim="vacante.direccion"
@@ -261,6 +449,14 @@
           placeholder="Av. Pdte. Kennedy 46654, Las Condes, Región Metropolitana"
           :disabled="!validarActivacionCampoDireccion"
           :rules="validarReglaDireccion"
+          @focus="
+            capturarAnalitica(
+              'Focus',
+              'Inputs',
+              'Dirección de empleo',
+              'Llenar campo con dirección de empleo'
+            )
+          "
         ></v-text-field>
       </fieldset>
 
@@ -268,12 +464,21 @@
       <fieldset>
         <legend>Medio de contacto</legend>
         <v-text-field
+          id="correo-contacto"
           variant="outlined"
           density="compact"
           v-model.trim="vacante.contacto"
           label="Correo de contacto *"
           placeholder="jdunn@hooli.xyz"
           :rules="reglasValidacionFormulario.correo"
+          @focus="
+            capturarAnalitica(
+              'Focus',
+              'Inputs',
+              'Correo de contacto',
+              'Llenar campo con correo de contacto'
+            )
+          "
         ></v-text-field>
       </fieldset>
     </v-form>
@@ -283,6 +488,7 @@
 <script setup>
 import { onMounted, defineEmits, ref, reactive, computed, watch } from "vue";
 import { useDisplay } from "vuetify";
+import { event } from "vue-gtag";
 
 onMounted(() => {
   const stringLocalStorage = localStorage.getItem("vacante");
@@ -519,6 +725,13 @@ function resetearCampos() {
   vacante.requisitosDeseables = [];
   vacante.beneficios = [];
   formulario.value.resetValidation();
+
+  capturarAnalitica(
+    "Click",
+    "Buttons",
+    "Limpiar campos",
+    "Limpiar todos los campos"
+  );
 }
 function filtrarBusqueda(undefined, queryBusqueda, monedas) {
   const nombreMonedaNormalizada = normalizar(monedas.raw.nombre);
@@ -526,29 +739,32 @@ function filtrarBusqueda(undefined, queryBusqueda, monedas) {
 
   return nombreMonedaNormalizada.indexOf(queryBusquedaNormalizada) > -1;
 }
-function agregarTarea() {
+function agregarTarea(evento, categoria, etiqueta, descripcion) {
   if (!vacante.tarea) return;
 
   vacante.tareas.push(vacante.tarea);
   vacante.tarea = "";
+  capturarAnalitica(evento, categoria, etiqueta, descripcion);
 }
 function eliminarTarea(indice) {
   vacante.tareas.splice(indice, 1);
 }
-function agregarRequisitoExcluyente() {
+function agregarRequisitoExcluyente(evento, categoria, etiqueta, descripcion) {
   if (!vacante.requisitoExcluyente) return;
 
   vacante.requisitosExcluyentes.push(vacante.requisitoExcluyente);
   vacante.requisitoExcluyente = "";
+  capturarAnalitica(evento, categoria, etiqueta, descripcion);
 }
 function eliminarRequisitoExcluyente(indice) {
   vacante.requisitosExcluyentes.splice(indice, 1);
 }
-function agregarRequisitoDeseable() {
+function agregarRequisitoDeseable(evento, categoria, etiqueta, descripcion) {
   if (!vacante.requisitoDeseable) return;
 
   vacante.requisitosDeseables.push(vacante.requisitoDeseable);
   vacante.requisitoDeseable = "";
+  capturarAnalitica(evento, categoria, etiqueta, descripcion);
 }
 function eliminarRequisitoDeseable(indice) {
   vacante.requisitosDeseables.splice(indice, 1);
@@ -558,14 +774,22 @@ function resetearCamposPago() {
   vacante.pagoMaximo = null;
   formulario.value.resetValidation(vacante.pagoMaximo);
 }
-function agregarBeneficio() {
+function agregarBeneficio(evento, categoria, etiqueta, descripcion) {
   if (!vacante.beneficio) return;
 
   vacante.beneficios.push(vacante.beneficio);
   vacante.beneficio = "";
+  capturarAnalitica(evento, categoria, etiqueta, descripcion);
 }
 function eliminarBeneficio(indice) {
   vacante.beneficios.splice(indice, 1);
+}
+function capturarAnalitica(evento, categoria, etiqueta, descripcion) {
+  event(evento, {
+    event_category: categoria,
+    event_label: etiqueta,
+    event_action: descripcion,
+  });
 }
 </script>
 

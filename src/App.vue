@@ -31,6 +31,14 @@
           href="https://github.com/esdrasMH/simpli-post"
           target="_blank"
           title="Ir al sitio web de GitHub"
+          @click="
+            capturarAnalitica(
+              'Click',
+              'Links',
+              'Link de GitHub',
+              'Ir al sitio web de GitHub'
+            )
+          "
         ></v-btn>
       </template>
 
@@ -40,18 +48,45 @@
             <v-col cols="12" lg="10" xl="8" xxl="6">
               <v-tabs grow color="primary">
                 <v-tab
+                  id="vista-editor-publicacion"
                   text="Editor"
-                  @click="cambiarPestanaActiva(0)"
+                  @click="
+                    cambiarPestanaActiva(
+                      0,
+                      'Click',
+                      'Tabs',
+                      'Editor',
+                      'Ir al edictor de la publicación'
+                    )
+                  "
                   title="Ir al edictor de la publicación"
                 ></v-tab>
                 <v-tab
+                  id="vista-previa-publicacion"
                   text="Vista previa"
-                  @click="cambiarPestanaActiva(1)"
+                  @click="
+                    cambiarPestanaActiva(
+                      1,
+                      'Click',
+                      'Tabs',
+                      'Vista previa',
+                      'Ir a la vista previa de la publicación'
+                    )
+                  "
                   title="Ir a la vista previa de la publicación"
                 ></v-tab>
                 <v-tab
+                  id="vista-previa-ejemplo"
                   text="Ejemplo"
-                  @click="cambiarPestanaActiva(2)"
+                  @click="
+                    cambiarPestanaActiva(
+                      2,
+                      'Click',
+                      'Tabs',
+                      'Ejemplo',
+                      'Ir a la vista previa de ejemplo'
+                    )
+                  "
                   title="Ir a la vista previa de ejemplo"
                 ></v-tab>
               </v-tabs>
@@ -86,6 +121,7 @@
 <script setup>
 import { useTheme } from "vuetify";
 import { ref } from "vue";
+import { event } from "vue-gtag";
 import EditorPublicacion from "./components/EditorPublicacion.vue";
 import VistaPreviaPublicacion from "./components/VistaPreviaPublicacion.vue";
 import EjemploPublicacion from "./components/EjemploPublicacion.vue";
@@ -97,13 +133,37 @@ const esValido = ref(false);
 
 function cambiarTema() {
   tema.global.name.value = tema.global.current.value.dark ? "light" : "dark";
+
+  capturarAnalitica(
+    "Click",
+    "Buttons",
+    "cambiarTema",
+    "Alternar tema entre claro y oscuro"
+  );
 }
 
-function cambiarPestanaActiva(indice) {
+function cambiarPestanaActiva(
+  indice,
+  evento,
+  categoria,
+  etiqueta,
+  descripcion
+) {
   pestanaActiva.value = pestanas.value[indice];
+
+  capturarAnalitica(evento, categoria, etiqueta, descripcion);
 }
+
 function handleCustomEvent(valor) {
   esValido.value = valor;
+}
+
+function capturarAnalitica(evento, categoria, etiqueta, descripcion) {
+  event(evento, {
+    event_category: categoria,
+    event_label: etiqueta,
+    event_action: descripcion,
+  });
 }
 </script>
 
