@@ -5,8 +5,17 @@
  */
 
 // Plugins
-import vuetify from './vuetify'
+import vuetify from "./vuetify";
+import VueGtag from "vue-gtag";
 
-export function registerPlugins (app) {
-  app.use(vuetify)
+export function registerPlugins(app) {
+  app.use(vuetify);
+  app.use(VueGtag, {
+    config: {
+      id: "G-T8MYVDB6JW",
+      params: {
+        anonymize_ip: true,
+      },
+    },
+  });
 }
