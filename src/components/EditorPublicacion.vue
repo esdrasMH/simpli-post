@@ -76,6 +76,7 @@
               'Llenar campo con título de la vacante'
             )
           "
+          @blur="obtenerSugerenciasTareas(), obtenerRequisitosExcluyentes()"
         ></v-combobox>
 
         <v-textarea
@@ -130,6 +131,42 @@
           "
         ></v-text-field>
 
+        <v-card
+          v-if="sugerencias.tareas.length"
+          class="sugerencias my-4"
+          elevation="0"
+          :color="
+            tema.global.name.value === 'dark'
+              ? 'yellow-lighten-3'
+              : 'blue-lighten-3'
+          "
+          :style="`border: 5px dashed ${
+            tema.global.name.value === 'dark' ? '#F9A825' : '#1565C0'
+          };`"
+        >
+          <h3>Sugerencias</h3>
+
+          <v-chip-group column class="mt-n2 mb-1">
+            <v-chip
+              :id="`sugerencia-responsabilidad-principal-${index}`"
+              v-for="(sugerencia, index) in sugerencias.tareas"
+              closable
+              @click:close="eliminarTareasSugeridas(index)"
+              :key="`chip-${sugerencia}`"
+              >{{ sugerencia }}</v-chip
+            >
+          </v-chip-group>
+
+          <div class="d-flex justify-space-between mt-4">
+            <v-btn variant="outlined" @click="eliminarTareasSugeridas()"
+              >Rechazar</v-btn
+            >
+            <v-btn color="primary" @click="agregarTareasSugeridas"
+              >Aceptar</v-btn
+            >
+          </div>
+        </v-card>
+
         <v-chip-group v-if="vacante.tareas.length" column class="mt-n2 mb-1">
           <v-chip
             :id="`responsabilidad-principal-${index}`"
@@ -181,6 +218,42 @@
           "
         ></v-text-field>
 
+        <v-card
+          v-if="sugerencias.requisitosExcluyentes.length"
+          class="sugerencias my-4"
+          elevation="0"
+          :color="
+            tema.global.name.value === 'dark'
+              ? 'yellow-lighten-3'
+              : 'blue-lighten-3'
+          "
+          :style="`border: 5px dashed ${
+            tema.global.name.value === 'dark' ? '#F9A825' : '#1565C0'
+          };`"
+        >
+          <h3>Sugerencias</h3>
+
+          <v-chip-group column class="mt-n2 mb-1">
+            <v-chip
+              :id="`sugerencia-requisitos-excluyentes-${index}`"
+              v-for="(sugerencia, index) in sugerencias.requisitosExcluyentes"
+              closable
+              @click:close="eliminarRequisitosExcluyentes(index)"
+              :key="`chip-${sugerencia}`"
+              >{{ sugerencia }}</v-chip
+            >
+          </v-chip-group>
+
+          <div class="d-flex justify-space-between mt-4">
+            <v-btn variant="outlined" @click="eliminarRequisitosExcluyentes()"
+              >Rechazar</v-btn
+            >
+            <v-btn color="primary" @click="agregarRequisitosExcluyentes"
+              >Aceptar</v-btn
+            >
+          </div>
+        </v-card>
+
         <v-chip-group
           v-if="vacante.requisitosExcluyentes.length"
           column
@@ -229,6 +302,42 @@
             )
           "
         ></v-text-field>
+
+        <v-card
+          v-if="sugerencias.requisitosDeseables.length"
+          class="sugerencias my-4"
+          elevation="0"
+          :color="
+            tema.global.name.value === 'dark'
+              ? 'yellow-lighten-3'
+              : 'blue-lighten-3'
+          "
+          :style="`border: 5px dashed ${
+            tema.global.name.value === 'dark' ? '#F9A825' : '#1565C0'
+          };`"
+        >
+          <h3>Sugerencias</h3>
+
+          <v-chip-group column class="mt-n2 mb-1">
+            <v-chip
+              :id="`sugerencia-requisitos-deseables-${index}`"
+              v-for="(sugerencia, index) in sugerencias.requisitosDeseables"
+              closable
+              @click:close="eliminarRequisitosDeseables(index)"
+              :key="`chip-${sugerencia}`"
+              >{{ sugerencia }}</v-chip
+            >
+          </v-chip-group>
+
+          <div class="d-flex justify-space-between mt-4">
+            <v-btn variant="outlined" @click="eliminarRequisitosDeseables()"
+              >Rechazar</v-btn
+            >
+            <v-btn color="primary" @click="agregarRequisitosDeseables"
+              >Aceptar</v-btn
+            >
+          </div>
+        </v-card>
 
         <v-chip-group
           v-if="vacante.requisitosDeseables.length"
@@ -487,8 +596,9 @@
 
 <script setup>
 import { onMounted, defineEmits, ref, reactive, computed, watch } from "vue";
-import { useDisplay } from "vuetify";
+import { useDisplay, useTheme } from "vuetify";
 import { event } from "vue-gtag";
+import { obtenerSugerencias } from "../services/gpt.js";
 
 onMounted(() => {
   const stringLocalStorage = localStorage.getItem("vacante");
@@ -505,6 +615,7 @@ const actualizarLocalStore = debounce((vacante) => {
 }, 1000);
 
 const { smAndUp } = useDisplay();
+const tema = useTheme();
 
 const emit = defineEmits(["customEvent"]);
 
@@ -654,6 +765,11 @@ let vacante = reactive({
   direccion: null,
   contacto: null,
 });
+let sugerencias = reactive({
+  tareas: [],
+  requisitosExcluyentes: [],
+  requisitosDeseables: [],
+});
 
 // metodos computados
 const validarReglaTareas = computed(() => {
@@ -791,6 +907,191 @@ function capturarAnalitica(evento, categoria, etiqueta, descripcion) {
     event_action: descripcion,
   });
 }
+function generarPrompt(cantidad = 3, tipo, complemento, cargo) {
+  return `genera un array en JavaScript con las ${cantidad} ${tipo} de un ${cargo}, ${complemento}. no requiero la explicacion del código, solo el array.`;
+}
+async function obtenerSugerenciasTareas() {
+  const cargo = vacante.cargo?.nombre || vacante?.cargo;
+
+  if (cargo === "") return;
+
+  try {
+    const complemento = `no debe incluir ${vacante.tareas.join(
+      ", "
+    )}, ${sugerencias.tareas.join(", ")}`;
+
+    const prompt = generarPrompt(
+      undefined,
+      "tareas principales",
+      complemento,
+      cargo
+    );
+    const texto = await obtenerSugerencias(prompt);
+    const tareasSugeridas = extraerArrayDelTexto(texto);
+
+    sugerencias.tareas = [...tareasSugeridas];
+  } catch (error) {
+    console.error("Error al obtener sugerencias de tareas", error);
+  }
+}
+async function obtenerRequisitosExcluyentes() {
+  const cargo = vacante.cargo?.nombre || vacante?.cargo;
+
+  if (cargo === "") return;
+
+  try {
+    const complemento = `no debe incluir ${vacante.requisitosExcluyentes.join(
+      ", "
+    )}, ${sugerencias.requisitosExcluyentes.join(", ")}`;
+
+    const prompt = generarPrompt(
+      undefined,
+      "requisitos excluyentes",
+      complemento,
+      cargo
+    );
+    const texto = await obtenerSugerencias(prompt);
+    const requisitosExcluyentesSugeridos = extraerArrayDelTexto(texto);
+
+    sugerencias.requisitosExcluyentes = [...requisitosExcluyentesSugeridos];
+
+    obtenerRequisitosDeseables();
+  } catch (error) {
+    console.error(
+      "Error al obtener sugerencias de requisitos excluyentes",
+      error
+    );
+  }
+}
+async function obtenerRequisitosDeseables() {
+  const cargo = vacante.cargo?.nombre || vacante?.cargo;
+
+  if (cargo === "") return;
+
+  try {
+    const complemento = `no debe incluir ${vacante.requisitosExcluyentes.join(
+      ", "
+    )}, ${vacante.requisitosDeseables.join(
+      ", "
+    )}, ${sugerencias.requisitosExcluyentes.join(
+      ", "
+    )}, ${sugerencias.requisitosDeseables.join(", ")}`;
+
+    const prompt = generarPrompt(
+      undefined,
+      "requisitos deseables",
+      complemento,
+      cargo
+    );
+    const texto = await obtenerSugerencias(prompt);
+    const requisitosDeseablesSugeridos = extraerArrayDelTexto(texto);
+
+    sugerencias.requisitosDeseables = [...requisitosDeseablesSugeridos];
+  } catch (error) {
+    console.error(
+      "Error al obtener sugerencias de requisitos deseables",
+      error
+    );
+  }
+}
+function extraerArrayDelTexto(texto) {
+  const regexArray = /\[\s*([^]*?)\s*\]/;
+  const coincidencia = texto.match(regexArray);
+
+  if (coincidencia) {
+    const cadenaArray = `[${coincidencia[1]}]`;
+
+    try {
+      return JSON.parse(
+        cadenaArray.replace(/(\w+):/g, '"$1":').replace(/'/g, '"')
+      );
+    } catch (error) {
+      console.error("Error al parsear JSON:", error);
+      return null;
+    }
+  } else {
+    console.error("No se encontró ningún array en el texto.");
+    return null;
+  }
+}
+function agregarTareasSugeridas() {
+  sugerencias.tareas.forEach((st) => vacante.tareas.push(st));
+
+  sugerencias.tareas = [];
+
+  capturarAnalitica(
+    "Click",
+    "Buttons",
+    "Aceptar",
+    "Agregar las tareas sugeridas por Gemini"
+  );
+}
+function eliminarTareasSugeridas(indice) {
+  capturarAnalitica(
+    "Click",
+    "Buttons",
+    "Rechazar",
+    "Rechazar las tareas sugeridas por Gemini"
+  );
+
+  if (indice !== undefined) return sugerencias.tareas.splice(indice, 1);
+
+  sugerencias.tareas = [];
+}
+function agregarRequisitosExcluyentes() {
+  sugerencias.requisitosExcluyentes.forEach((re) =>
+    vacante.requisitosExcluyentes.push(re)
+  );
+
+  sugerencias.requisitosExcluyentes = [];
+
+  capturarAnalitica(
+    "Click",
+    "Buttons",
+    "Aceptar",
+    "Agregar los requisitos excluyentes sugeridos por Gemini"
+  );
+}
+function eliminarRequisitosExcluyentes(indice) {
+  capturarAnalitica(
+    "Click",
+    "Buttons",
+    "Rechazar",
+    "Rechazar los requisitos excluyentes sugeridos por Gemini"
+  );
+
+  if (indice !== undefined)
+    return sugerencias.requisitosExcluyentes.splice(indice, 1);
+
+  sugerencias.requisitosExcluyentes = [];
+}
+function agregarRequisitosDeseables() {
+  sugerencias.requisitosDeseables.forEach((rd) =>
+    vacante.requisitosDeseables.push(rd)
+  );
+
+  sugerencias.requisitosDeseables = [];
+
+  capturarAnalitica(
+    "Click",
+    "Buttons",
+    "Aceptar",
+    "Agregar los requisitos deseables sugeridos por Gemini"
+  );
+}
+function eliminarRequisitosDeseables(indice) {
+  capturarAnalitica(
+    "Click",
+    "Buttons",
+    "Rechazar",
+    "Rechazar los requisitos deseables sugeridos por Gemini"
+  );
+
+  if (indice !== undefined)
+    return sugerencias.requisitosDeseables.splice(indice, 1);
+
+  sugerencias.requisitosDeseables = [];
+}
 </script>
 
 <style scoped>
@@ -800,5 +1101,15 @@ fieldset {
   background-color: rgb(var(--v-theme-surface-light));
   border: none;
   border-radius: 8px;
+}
+
+.sugerencias {
+  padding: 12px;
+  border-radius: 3px;
+}
+
+.sugerencias h3 {
+  text-align: center;
+  margin-bottom: 12px;
 }
 </style>
